@@ -7,7 +7,8 @@ reflects on this project as well.  Additionally, there are two maintained Python
 Last.FM APIs: [`pylast`](https://github.com/pylast/pylast), which relies on an
 MD5-hashed user password, and [`lastpy`](https://github.com/huberf/lastfm-scrobbler),
 which is a bit clunky and doesn't support custom timestamps
-([yet](https://github.com/huberf/lastfm-scrobbler/pull/3)).
+([yet](https://github.com/huberf/lastfm-scrobbler/pull/3)).  Currently we're rolling
+our own Last.FM integration based on `lastpy`.
 
 ## Limitations
 This project works around limitations from YouTube Music in a few ways:
@@ -110,19 +111,30 @@ Speaking of cookies, let's set this up:
 ## Future Improvements
 This is the minimum product I'm comfortable releasing after a long night of relearning
 Python.  There are some definite quality of life improvements to be made:
-- **HTTP server:** We should be able to receive that callback and store the token
-  ourselves, preferably in...
-- **A database:** Tracking users, tokens, cookies, etc.  Foundations of a multi-user
-  system with Last.FM federation.
-- **Docker container:** Because Docker makes everything better.  Preferably not just
-  the `main.py`, but a `cron` job or some other automation to run at `n` interval.
-- **Wait for YouTube Music API to get better:** Either the unofficial version or
-  (hopefully) an official version with the necessary features.
-- **An automation to capture cookies:** This is the highest bar for casual adoption.
-  Not sure how to solve this, but I know there are already extensions that do this
-  for YouTube-DL-type services.  Needs investigation, may be able to repurpose an
-  existing extension.
-- **Python is not my language of choice:** If you see something wrong from a style
-  or convention perspective let me know!  I'd love to get this ported to Deno or
-  something like that, but I want to keep support for the *only* existing YouTube
-  Music API for now so it's going to stay Python for the time being.
+- [ ] **HTTP server:**
+
+  We should be able to receive that callback and store the token ourselves, preferably
+  in...
+- [ ] **A database:**
+
+  Tracking users, tokens, cookies, etc.  Foundations of a multi-user system with Last.FM
+  federation.
+- [ ] **Docker container:**
+
+  Because Docker makes everything better.  Preferably not just the `main.py`, but a `cron`
+  job or some other automation to run at *n* interval.
+- [ ] **Wait for YouTube Music API to get better:**
+
+  Either the unofficial version or (hopefully) an official version with the necessary
+  features.
+- [ ] **An automation to capture cookies:**
+
+  This is the highest bar for casual adoption. Not sure how to solve this, but I know
+  there are already extensions that do this for YouTube-DL-type services.  Needs
+  investigation, may be able to repurpose an existing extension.
+- [ ] **Python is not my language of choice:**
+
+  If you see something wrong from a style or convention perspective let me know!  I'd love
+  to get this ported to Deno or something like that, but I want to keep support for the
+  *only* existing YouTube Music API for now so it's going to stay Python for the time
+  being.
