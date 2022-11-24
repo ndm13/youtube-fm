@@ -8,14 +8,11 @@ class LastFMException(BaseException):
 
 
 class LastFM:
-    api_head = 'https://ws.audioscrobbler.com/2.0/'
-
-    def __init__(self, api_key, secret_key, session_token=None, api_head=None):
+    def __init__(self, api_key, secret_key, session_token=None, api_root='https://ws.audioscrobbler.com/2.0/'):
         self.api_key = api_key
         self.secret_key = secret_key
         self.session_key = session_token
-        if api_head is not None:
-            self.api_head = api_head
+        self.base = api_root
 
     def authorize(self, user_token):
         params = {
@@ -23,9 +20,9 @@ class LastFM:
             'method': 'auth.getSession',
             'token': user_token
         }
-        params['api_sig'] = self.hash_request(params)
+        params['api_sig'] = self._hash_request(params)
 
-        xml = BeautifulSoup(requests.post(self.api_head, params).text, 'xml')
+        xml = BeautifulSoup(requests.post(self.base, params).text, 'xml')
         if xml.find('lfm').attrs.get('status') == 'failed':
             raise LastFMException(xml.find('error').text)
 
@@ -43,12 +40,12 @@ class LastFM:
             'artist': artist,
             'sk': self.session_key
         }
-        params['api_sig'] = self.hash_request(params)
+        params['api_sig'] = self._hash_request(params)
 
-        xml = BeautifulSoup(requests.post(self.api_head, params).text, 'xml')
+        xml = BeautifulSoup(requests.post(self.base, params).text, 'xml')
         return xml.find('lfm').attrs.get("status") == "ok"
 
-    def hash_request(self, obj):
+    def _hash_request(self, obj):
         string = ''
         for i in sorted(obj.keys()):
             string += i
