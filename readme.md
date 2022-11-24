@@ -1,10 +1,13 @@
 # youtube-fm
 A bridge between YouTube Music and Last.FM.
 
-I have found exactly one YouTube Music API.  It is written in Python and is relatively
-limited, and that reflects on this project as well.  Additionally, there are two
-maintained Python Last.FM APIs: `pylast`, which relies on an MD5-hashed user password,
-and `lastpy`, which is a bit clunky and doesn't support custom timestamps ([yet](https://github.com/huberf/lastfm-scrobbler/pull/3)).
+I have found [exactly one](https://ytmusicapi.readthedocs.io/en/latest/index.html)
+YouTube Music API.  It is written in Python and is relatively limited, and that
+reflects on this project as well.  Additionally, there are two maintained Python
+Last.FM APIs: [`pylast`](https://github.com/pylast/pylast), which relies on an
+MD5-hashed user password, and [`lastpy`](https://github.com/huberf/lastfm-scrobbler),
+which is a bit clunky and doesn't support custom timestamps
+([yet](https://github.com/huberf/lastfm-scrobbler/pull/3)).
 
 ## Limitations
 This project works around limitations from YouTube Music in a few ways:
