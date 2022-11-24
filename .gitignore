@@ -1,0 +1,4 @@
+/.env
+/headers_auth.json
+/history.json
+/last_id.txt
