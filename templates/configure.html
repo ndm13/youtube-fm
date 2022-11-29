@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Configure User</title>
+    <style>
+        div {
+            color: white;
+            padding: 1em;
+        }
+        h3, h4 {
+            padding: 0;
+            margin: 0;
+        }
+        textarea {
+            width: 100%;
+            max-width: 60em;
+            height: 8em;
+            display: block;
+        }
+        pre {
+            display: inline;
+        }
+    </style>
+</head>
+<body>
+<h1>Configure User - youtube-fm</h1>
+{% if error %}
+<div style="background-color: red">
+    <h3>Error processing callback{% if target %} while updating <pre>{{ target }}</pre>{% endif %}!</h3>
+    <pre>{{ error }}</pre>
+</div>
+{% endif %}
+{% if target and not error and (old == None or old != new) %}
+<div style="background-color: blue">
+    <h3>Updated <pre>{{ target }}</pre>{% if old and new %} from <pre>{{ old }}</pre> to <pre>{{ new }}</pre>{% endif %}</h3>
+</div>
+{% endif %}
+{% if snapshot %}
+<dl>
+    <dt>User Info</dt>
+    <dd>
+        <p>Registered on Last.FM with name: <kbd>{{ snapshot.name }}</kbd></p>
+        <p>Your API token is: <kbd>{{ user }}</kbd></p>
+        <p>
+            Last run: {{ snapshot.last_run }};
+            Next run: {% if snapshot.pause %}}PAUSED{% else %}{{ snapshot.last_run + snapshot.interval }}{% endif %}
+        </p>
+    </dd>
+    <dt>YouTube Music Integration</dt>
+    <dd>
+        <p>Integration is currently <b>{% if not snapshot.cookie %}IN{% endif %}ACTIVE</b></p>
+        <p>You can update the cookie used for YouTube Music here:</p>
+        <form method="post" action="{{ request.base_url }}">
+            <input type="hidden" name="user" value="{{ user }}"/>
+            <input type="hidden" name="target" value="cookie"/>
+            <textarea name="value"></textarea>
+            <input type="submit" value="Update Cookies"/>
+        </form>
+    </dd>
+    <dt>Scrobble Settings</dt>
+    <dd>
+        <ul>
+            <li>
+                <pre>split_title</pre>: Try to detect if a title is in "artist - track" format before submitting to
+                Last.FM.  Defaults to <pre>False</pre>.  Currently <pre>{{ snapshot.split_title }}</pre>.
+                <form method="post" action="{{ request.base_url }}">
+                    <input type="hidden" name="user" value="{{ user }}"/>
+                    <input type="hidden" name="target" value="split_title"/>
+                    <input type="checkbox" name="handle"{% if snapshot.split_title %} checked{% endif %}/>
+                    <input type="hidden" name="value" value="{{ snapshot.split_title }}"/>
+                    <input type="submit" value="Update"/>
+                </form>
+            </li>
+            <li>
+                <pre>interval</pre>: The number of seconds to wait before checking for new tracks.  Lower numbers are
+                more accurate but will raise the risk of getting your API banned/limited (both YouTube and Last.FM).
+                Defaults to <pre>3000</pre>.  Currently <pre>{{ snapshot.interval }}</pre>.
+                <form method="post" action="{{ request.base_url }}">
+                    <input type="hidden" name="user" value="{{ user }}"/>
+                    <input type="hidden" name="target" value="interval"/>
+                    <input type="number" name="value" value="{{ snapshot.interval }}"/>
+                    <input type="submit" value="Update"/>
+                </form>
+            </li>
+            <li>
+                <pre>pause</pre>: Disable syncing.  On resume, all available history will by synced.  Defaults to
+                <pre>False</pre>.  Currently <pre>{{ snapshot.pause }}</pre>.
+                <form method="post" action="{{ request.base_url }}">
+                    <input type="hidden" name="user" value="{{ user }}"/>
+                    <input type="hidden" name="target" value="pause"/>
+                    <input type="checkbox" name="handle"{% if snapshot.pause %} checked{% endif %}/>
+                    <input type="hidden" name="value" value="{{ snapshot.pause }}"/>
+                    <input type="submit" value="Update"/>
+                </form>
+            </li>
+        </ul>
+    </dd>
+</dl>
+<script>
+    document.querySelectorAll('input[type="checkbox"]').forEach(e => {
+        e.addEventListener('change', () => {
+            document.querySelectorAll('input[type="checkbox"]+input[type="hidden"]')
+                .forEach(e2 => e2.value = e.checked);
+        })
+    })
+</script>
+{% endif %}
+</body>
+</html>

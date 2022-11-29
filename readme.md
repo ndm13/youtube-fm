@@ -51,78 +51,63 @@ Speaking of cookies, let's set this up:
    ```bash
    $ git clone https://github.com/ndm13/youtube-fm.git
    ```
-2. Get the browser cookies for the YouTube Music API (see: [Authenticated Requests on ytmusicapi Docs](https://ytmusicapi.readthedocs.io/en/latest/setup.html#authenticated-requests)).
-   The setup scripts from this library are integrated: if you don't have a
-   `headers_auth.json` file, the script will walk you through generating one.  I
-   personally had issues with reading this from stdin, so there's the option of adding
-   the headers to a file (path stored in `HEADERS_FILE` environment variable, `.env`
-   supported) that will be used for setup instead.
+2. Ensure the `LASTFM_API` and `LASTFM_SECRET` environment variables contain your API key and secret, respectively.
+   You should also set the `SECRET_KEY` now as this will be used to encrypt values in the database.
+3. Start the web server:
+   ```bash
+   $ python server.py
+    * Serving Flask app 'server'
+    * Debug mode: off
+   INFO:werkzeug:WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+    * Running on http://127.0.0.1:5000
+   INFO:werkzeug:Press CTRL+C to quit
+   ```
+4. Navigate to the URL shown to begin setup.  You should see a message like this:
+   ![Header: Welcome to youtube-fm setup! Body: To add a user to this instance, (link) connect with Last.FM.](docs/step_4.png)
+   Click the link - it's already configured with your API key and will redirect to the running server.  On the new page,
+   click the Authorize button to return to the server.
+5. You should be returned to a screen like this:
+   ![Header: Last.FM API Callback - youtube-fm Body: header section with sample token and message to copy the token,
+   main section asking the user to paste the output of a linked guide in a textarea.](docs/step_5.png)
+   Follow the steps in the linked guide to get the necessary headers for YouTube Music, then paste those headers in the
+   text area and click Submit.
+6. You should see a notice that cookies were successfully saved:
+   ![Header: Cookies Callback - youtube-fm Body: success messsage saying that cookies were added with a button to
+   configure the new user](docs/step_6.png)
+   Click the button to configure the user, or close to accept the default values.
+7. To scrape YouTube Music and scrobble the tracks to Last.FM, run the main script:
    ```bash
    $ python main.py
-   Please paste the request headers from Firefox and press 'Enter, Ctrl-Z, Enter' to continue:
+   INFO:root:Connecting to database
+   INFO:root:Started run, pulling users
+   INFO:root:Running update for user <user> (<uuid>)
+   INFO:root:Scrobbling 'Everybody Likes You' by Lemon Demon
+   INFO:root:Writing ID 4xElp-lYnyE as new last
    ```
-3. Setup a Last.FM API key and secret (see: [Last.FM API Docs](http://www.last.fm/api/authentication)).
-   Store these in `LASTFM_API` and `LASTFM_SECRET` environment variables (`.env`
-   supported).
-4. Generate a user token.  This will let you perform your first pull and set you up
-   with a session token that you can use for all future runs.  Running the script
-   without either `LASTFM_TOKEN` or `LASTFM_SESSION` set will give you the link you
-   need to use to generate a token. *Note: if you use port 5555 for anything, please
-   change the port number in the link to an unused port.*
-   ```bash
-   $ python main.py
-   ERROR:root:You will need to generate a user token:
-   ERROR:root:https://www.last.fm/api/auth?api_key=<your_api_token>=http://localhost:5555
-   Traceback (most recent call last):
-     File "main.py", line 53, in <module>
-       raise Exception("Can't authenticate! Set LASTFM_TOKEN or LASTFM_SESSION to access Last.FM")
-   Exception: Can't authenticate! Set LASTFM_TOKEN or LASTFM_SESSION to access Last.FM
-   ```
-   Clicking the Authorize button on that page will redirect you to a nonexistent
-   localhost page with a url like `http://localhost:5555/?token=<some_token_here>`.
-   Copy everything after the equals sign and store it in the `LASTFM_TOKEN` environment
-   variable (`.env` supported).
-5. On first run, the history will be pulled and scrobbled, but you will get a warning
-   about setting the `LASTFM_SESSION` environment variable:
-   ```bash
-   $ python main.py
-   WARNING:root:Using LASTFM_TOKEN: You will need to generate a new token every run!
-   WARNING:root:To prevent this, set the LASTFM_SESSION environment variable generated below:
-   WARNING:root:	LASTFM_SESSION=<some_session_id>
-   INFO:root:Scrobbling 'and the day goes on' by bill wurtz
-   INFO:root:Scrobbling 'Lemon Demon - Everybody Likes You' by Neil Cicierega
-   INFO:root:Scrobbling 'The Business of Emotion (feat. White Sea)' by Big Data
-   INFO:root:Writing ID NHZr6P1csiY as new last
-   ```
-   Set the `LASTFM_SESSION` variable as shown (`.env` supported).
-6. Did you notice this line?
-   ```
-   INFO:root:Scrobbling 'Lemon Demon - Everybody Likes You' by Neil Cicierega
-   ```
-   That's a lie: the title includes the artist.  YouTube isn't smart enough to figure
-   this out, but we can try to hack around it by saying `artist - title` means the
-   artist is `artist` and the title is `title`.  You can enable this by setting the
-   environment variable `SPLIT_TITLE` to `true` (again, `.env` supported).  Don't do
-   this if you have lots of music that does use dashes and doesn't use this naming
-   convention.
-7. The default log level is `INFO`.  You can change it by setting the environment
-   variable `LOG_LEVEL` per the Python logging spec.
+   This will run the script for all users whose last run was longer ago than their chosen interval.  The default
+   interval is `3000` seconds (every five minutes).  The more often `main.py` runs, the closer the user's individual
+   runs will be to their requested interval, but that means more load placed on both the Last.FM and YouTube Music APIs.
+   Be wary of rate limits/bans!
+
+P.S: The default log level is `INFO`.  You can change it by setting the environment variable `LOG_LEVEL` per the Python
+logging spec.
 
 ## Future Improvements
 This is the minimum product I'm comfortable releasing after a long night of relearning
 Python.  There are some definite quality of life improvements to be made:
-- [ ] **HTTP server:**
+- [x] ~~**HTTP server:**~~
 
-  We should be able to receive that callback and store the token ourselves, preferably
-  in...
-- [ ] **A database:**
+  Currently using Flask to handle Last.FM callback and user configuration.
+- [x] ~~**A database:**~~
 
-  Tracking users, tokens, cookies, etc.  Foundations of a multi-user system with Last.FM
-  federation.
+  Currently using Sqlite3 with a user-provided `SECRET_KEY` encrypting the user tokens/cookies.
 - [ ] **Docker container:**
 
   Because Docker makes everything better.  Preferably not just the `main.py`, but a `cron`
   job or some other automation to run at *n* interval.
+- [ ] **Clean up this UI:**
+
+  It's so ugly.  Like, actually.  I literally threw this together for a proof of concept.
 - [ ] **Wait for YouTube Music API to get better:**
 
   Either the unofficial version or (hopefully) an official version with the necessary
