@@ -55,7 +55,7 @@ Speaking of cookies, let's set this up:
    You should also set the `SECRET_KEY` now as this will be used to encrypt values in the database.
 3. Start the web server:
    ```bash
-   $ python server.py
+   $ python -m flask run server
     * Serving Flask app 'server'
     * Debug mode: off
    INFO:werkzeug:WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
@@ -77,8 +77,8 @@ Speaking of cookies, let's set this up:
    Click the button to configure the user, or close to accept the default values.
 7. To scrape YouTube Music and scrobble the tracks to Last.FM, run the main script:
    ```bash
-   $ python main.py
-   INFO:root:Connecting to database
+   $ python -m daemon
+   INFO:root:Connecting to core
    INFO:root:Started run, pulling users
    INFO:root:Running update for user <user> (<uuid>)
    INFO:root:Scrobbling 'Everybody Likes You' by Lemon Demon

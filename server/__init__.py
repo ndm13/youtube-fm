@@ -1,16 +1,12 @@
 import logging
 
-from dotenv import load_dotenv
 from flask import Flask, request, render_template
 from os import getenv
 
 from ytmusicapi import YTMusic
 
-from db import Database, DatabaseException
-from lastfm import LastFM, LastFMException
+from core import Database, DatabaseException, LastFM, LastFMException
 
-load_dotenv()
-logging.basicConfig(level=getenv('LOG_LEVEL', 'INFO').upper())
 app = Flask(__name__)
 lastfm_api = getenv('LASTFM_API')
 lastfm_secret = getenv('LASTFM_SECRET')
