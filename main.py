@@ -14,6 +14,8 @@ def run_user():
 
     lastfm = LastFM(getenv('LASTFM_API'), getenv('LASTFM_SECRET'), session_token=user.token)
     ytm = YTMusic(user.cookie)
+    # Storing the headers in the DB introduces carriage returns... somehow.
+    # Could be a bug in the DB or the API.  Easiest solution is to manually strip the headers here.
     for key, value in ytm.headers.items():
         ytm.headers[key] = ytm.headers[key].strip()
     history = ytm.get_history()
@@ -53,5 +55,7 @@ if __name__ == "__main__":
     logging.info("Connecting to database")
     db = Database("users.sqlite", getenv('SECRET_KEY'))
     logging.info("Started run, pulling users")
-    for user in db.get_users_for_run(int(time())):
+    users = db.get_users_for_run(int(time()))
+    for user in users:
         run_user()
+    logging.info("Ran stats for %i users", len(users))

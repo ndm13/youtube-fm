@@ -1,5 +1,6 @@
 from sqlite3 import connect, Error as SqliteError
 
+from dataclasses import dataclass
 from cryptography.exceptions import UnsupportedAlgorithm
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
@@ -11,17 +12,17 @@ class DatabaseException(Exception):
     pass
 
 
+@dataclass()
 class User:
-    def __init__(self, name, uuid, token, cookie, split_title, interval, last_run, last_id, pause):
-        self.name = name
-        self.uuid = uuid
-        self.token = token
-        self.cookie = cookie
-        self.split_title = split_title
-        self.interval = interval
-        self.last_run = last_run
-        self.last_id = last_id
-        self.pause = pause
+    name: str
+    uuid: str
+    token: str
+    cookie: str
+    split_title: bool
+    interval: int
+    last_run: int
+    last_id: str
+    pause: bool
 
 
 class Database:
