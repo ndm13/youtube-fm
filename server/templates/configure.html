@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Configure - YouTube-FM</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous"/>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"
+            integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V"
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+</head>
+<body>
+<div class="container">
+    <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+        <a href="/" class="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
+            <h3>YouTube-FM</h3>
+        </a>
+
+        <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+            <li><span class="nav-item px-2 link-primary">Configure Settings</span></li>
+        </ul>
+
+        <div class="col-md-3 text-end"></div>
+    </header>
+    <main class="py-5 col-md-9 mx-auto">
+        <h4>Configure Your Settings</h4>
+        {% for category, message in get_flashed_messages(with_categories=true) %}
+            <div class="alert alert-{{ "danger" if category == "error" else "info" }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+        {% if not session.user %}
+            <p>It doesn't look like you have an active session. Enter your account ID to get started:</p>
+            <form class="input-group w-50 mx-auto" method="post" action="{{ url_for('configure.index') }}">
+                <input class="form-control" type="text" name="user" placeholder="00000000-0000-0000-0000-000000000000"/>
+                <button type="submit" class="btn btn-primary">Let's Go</button>
+            </form>
+        {% else %}
+            <p>Welcome, {{ user.name }}!</p>
+            <p>You can view or reset your account ID here.</p>
+            <p>
+                <strong>Warning:</strong>
+                <em>
+                    If you reset your account ID, you will no longer be able to use your current ID! A new ID will be
+                    generated for you.
+                </em>
+            </p>
+            <p>
+            <div class="d-inline-flex align-items-start gap-3">
+                <form method="post" action="{{ url_for('configure.reset_id') }}"
+                      class="input-group m-auto flex-grow-1 flex-nowrap" id="acc-id">
+                    <label for="key" class="input-group-text">Account ID:</label>
+                    <span class="col-md-6">
+                    <input type="password" id="key" class="form-control" value="{{ session.user }}"/>
+                </span>
+                    <button type="button" class="btn btn-outline-dark">
+                        <i class="bi bi-eye-slash"></i>
+                    </button>
+                    <button type='submit' class="btn btn-danger">Reset&nbsp;ID</button>
+                </form>
+                <a class="btn btn-info" href="{{ url_for('configure.sign_out') }}">Sign&nbsp;Out</a>
+            </div>
+            <script>
+                (acc => ((p, b) => b.onclick = () => {
+                    p.setAttribute('type', p.getAttribute('type') === 'password' ? 'text' : 'password');
+                    b.querySelector('i').classList.toggle('bi-eye');
+                })(acc.querySelector('input[type=password]'), acc.querySelector('button')))(document.getElementById('acc-id'));
+            </script>
+            </p>
+            <h5>Scrobble Settings</h5>
+            <p>Configure how we scrobble data from YouTube Music to Last.FM.</p>
+            <section class="row g-4">
+                <div class="col-lg-6">
+                    <h6>Split Title</h6>
+                    <p>
+                        While most YouTube Music content properly extracts the artist name, older content not designed
+                        for
+                        YouTube Music may not report this correctly and use the traditional <kbd>&lt;artist&gt; - &lt;track&gt;</kbd>
+                        format. With this enabled, we'll try to detect that and fix it before sending it to Last.FM.
+                    </p>
+                    <p>
+                        <strong>Note:</strong> <em>This may cause issues with tracks that have hyphens in the name.</em>
+                    </p>
+                    <form class="input-group w-auto" method="post" action="{{ url_for('configure.split_title') }}">
+                        <span class="input-group-text">Currently: {{ "Enabled" if user.split_title else "Disabled" }}</span>
+                        <input type="hidden" name="value" value="{{ not user.split_title }}"/>
+                        <button class="btn btn-{{ "danger" if user.split_title else "success" }}">{{ "Disable" if  user.split_title else "Enable" }}</button>
+                    </form>
+                </div>
+                <div class="col-lg-6">
+                    <h6>Interval</h6>
+                    <p>
+                        We check YouTube Music for updates at roughly this frequency. Setting a higher number means we
+                        will be able to report more accurate times to Last.FM, but runs the risk of your account getting
+                        flagged for suspicious activity. We recommend setting this to <kbd>3000</kbd> seconds (once
+                        every five minutes).
+                    </p>
+                    <form class="input-group w-auto" method="post" action="{{ url_for('configure.interval') }}">
+                        <span class="col-md-4">
+                            <input class="form-control col-1" type="text" name="value" value="{{ user.interval }}"/>
+                        </span>
+                        <span class="input-group-text">seconds</span>
+                        <button class="btn btn-primary">Update Interval</button>
+                    </form>
+                </div>
+                <div class="col-12">
+                    <h6>Pause Syncing</h6>
+                    <p>
+                        Stop syncing this account. When you resume syncing, all available account history will be
+                        synced.
+                    </p>
+                    <form class="input-group w-auto" method="post" action="{{ url_for('configure.pause') }}">
+                        <span class="input-group-text{% if user.pause %} text-warning{% endif %}">Currently: {{ "Paused" if user.pause else "Not Paused" }}</span>
+                        <input type="hidden" name="value" value="{{ not user.pause }}"/>
+                        <button class="btn btn-{{ "success" if user.pause else "warning" }}">{{ "Unpause" if user.pause else "Pause" }}</button>
+                    </form>
+                </div>
+            </section>
+            <h5 class="my-3">YouTube Music Integration</h5>
+            <p>Note: If your account is not linked, then you will not be able to sync with Last.FM!</p>
+            <span class="input-group">
+                <span class="input-group-text text-{{ "success" if user.cookie else "danger" }}">Status: {{ "Linked" if user.cookie else "NOT Linked" }}</span>
+                <a class="btn btn-primary"
+                   href="{{ url_for('setup.ytmusic') }}">{{ "Re-Link" if user.cookie else "Link" }}</a>
+            </span>
+        {% endif %}
+    </main>
+</div>
+</body>
+</html>

@@ -3,7 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 
 
-class LastFMException(BaseException):
+class LastFMException(Exception):
     pass
 
 
@@ -27,7 +27,7 @@ class LastFM:
             raise LastFMException(xml.find('error').text)
 
         self.session_key = xml.find('key').text
-        return self.session_key
+        return self.session_key, xml.find('name').text
 
     def scrobble(self, artist, title, timestamp):
         if self.session_key is None:
