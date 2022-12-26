@@ -122,10 +122,9 @@ Python.  There are some definite quality of life improvements to be made:
 - [x] ~~**A database:**~~
 
   Currently using Sqlite3 with a user-provided `SECRET_KEY` encrypting the user tokens/cookies.
-- [ ] **Docker container:**
+- [x] ~~**Docker container:**~~
 
-  Because Docker makes everything better.  Preferably not just the `main.py`, but a `cron`
-  job or some other automation to run at *n* interval.
+  Continuously deploying containers for both daemon and server.  Docs include a compose file.
 - [x] ~~**Clean up this UI:**~~
   
   Bootstrap 5 and proper Flask blueprints.
