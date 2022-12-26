@@ -1,6 +1,6 @@
 from os import getenv
 
-from flask import current_app, g
+from flask import g
 
 from core import Database
 

@@ -6,6 +6,7 @@ from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
 from base64 import urlsafe_b64encode
 from uuid import UUID, uuid4
+from os import path
 
 
 class DatabaseException(Exception):
@@ -31,12 +32,13 @@ class Database:
             self.fernet = Fernet(
                 urlsafe_b64encode(Scrypt(salt=bytes("youtube-fm", 'utf-8'), length=32, n=2 ** 14, r=8, p=1)
                                   .derive(bytes(fernet_key, 'utf-8'))))
-            self.con = connect(sqlite_path)
+            dbpath = path.abspath(path.join(path.dirname(path.abspath(__file__)), "..", sqlite_path))
+            self.con = connect(dbpath)
             self.con.row_factory = lambda c, r: User(
                 r[0],
                 r[1],
-                str(self.fernet.decrypt(r[2].decode()), 'utf-8').replace('\r', '') if r[1] is not None else None,
-                str(self.fernet.decrypt(r[3].decode()), 'utf-8').replace('\r', '') if r[2] is not None else None,
+                str(self.fernet.decrypt(r[2]), 'utf-8').replace('\r', '') if r[2] is not None else None,
+                str(self.fernet.decrypt(r[3]), 'utf-8').replace('\r', '') if r[3] is not None else None,
                 r[4] == 1,
                 r[5],
                 r[6],
@@ -46,7 +48,7 @@ class Database:
 
             cursor = self.con.cursor()
             cursor.execute("create table if not exists users "
-                           "(uuid unique, name, token, cookie, split_title default false, interval default 3000,"
+                           "(uuid unique, name, token, cookie, split_title default false, interval default 300,"
                            "last_run default 0, last_id, pause default false)")
             cursor.close()
             self.con.commit()

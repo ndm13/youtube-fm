@@ -31,6 +31,7 @@ class Runner:
 
         if len(history) == 0:
             self.logger.info("No new tracks to log, skipping...")
+            self.db.update_last_run(user.uuid, start_time)
             return
 
         for entry in history:
