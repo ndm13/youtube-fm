@@ -55,6 +55,7 @@ x-common-env: &common-env
   LASTFM_API: $LASTFM_API       # A valid Last.FM API key
   LASTFM_SECRET: $LASTFM_SECRET # The secret for that key
   LOG_LEVEL: info               # The log level (info is default)
+  CONFIG_DIR: /app/config       # The config folder (/app/config is default)
   SECRET_KEY: $DB_SECRET        # The secret key for encrypting sensitive database stuff
 
 services:
@@ -67,10 +68,14 @@ services:
     environment:
       <<: *common-env
       # any additional environment variables
+    volumes:
+      - /data/ytfm:/app/config
   daemon:
     container_name: ytfm_daemon
     image: ghcr.io/ndm13/youtube-fm-daemon:latest
     environment: *common-env
+    volumes:
+      - /data/ytfm:/app/config
 ```
 Open the web interface (exposed on port 8080) to get started!
 
