@@ -8,6 +8,8 @@ from base64 import urlsafe_b64encode
 from uuid import UUID, uuid4
 from os import path
 
+from .config_dir import config_dir
+
 
 class DatabaseException(Exception):
     pass
@@ -32,8 +34,7 @@ class Database:
             self.fernet = Fernet(
                 urlsafe_b64encode(Scrypt(salt=bytes("youtube-fm", 'utf-8'), length=32, n=2 ** 14, r=8, p=1)
                                   .derive(bytes(fernet_key, 'utf-8'))))
-            dbpath = path.abspath(path.join(path.dirname(path.abspath(__file__)), "..", sqlite_path))
-            self.con = connect(dbpath)
+            self.con = connect(path.join(config_dir, sqlite_path))
             self.con.row_factory = lambda c, r: User(
                 r[0],
                 r[1],
