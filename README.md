@@ -48,6 +48,38 @@ but considering that the YouTube Music API relies on browser cookies it's probab
 good idea not to overdrive that, lest your actual YouTube account get flagged.
 
 Speaking of cookies, let's set this up:
+
+If you have Docker Compose, simply deploy the stack:
+```yml
+x-common-env: &common-env
+  LASTFM_API: $LASTFM_API       # A valid Last.FM API key
+  LASTFM_SECRET: $LASTFM_SECRET # The secret for that key
+  LOG_LEVEL: info               # The log level (info is default)
+  CONFIG_DIR: /app/config       # The config folder (/app/config is default)
+  SECRET_KEY: $DB_SECRET        # The secret key for encrypting sensitive database stuff
+
+services:
+  server:
+    container_name: ytfm_server
+    image: ghcr.io/ndm13/youtube-fm-server:latest
+    network_mode: external # something externally accessible
+    publish:
+      - 8080:8080  # web interface
+    environment:
+      <<: *common-env
+      # any additional environment variables
+    volumes:
+      - /data/ytfm:/app/config
+  daemon:
+    container_name: ytfm_daemon
+    image: ghcr.io/ndm13/youtube-fm-daemon:latest
+    environment: *common-env
+    volumes:
+      - /data/ytfm:/app/config
+```
+Open the web interface (exposed on port 8080) to get started!
+
+If you don't have Docker Compose, or wish to develop locally using the Flask server:
 1. Clone the project:
    ```bash
    $ git clone https://github.com/ndm13/youtube-fm.git

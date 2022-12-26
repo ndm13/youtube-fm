@@ -1,3 +1,2 @@
-/.env
-/users.sqlite
 /instance/
+/config/
