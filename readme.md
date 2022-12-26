@@ -6,8 +6,9 @@ YouTube Music API.  It is written in Python and is relatively limited, and that
 reflects on this project as well.  Additionally, there are two maintained Python
 Last.FM APIs: [`pylast`](https://github.com/pylast/pylast), which relies on an
 MD5-hashed user password, and [`lastpy`](https://github.com/huberf/lastfm-scrobbler),
-which is a bit clunky and doesn't support custom timestamps
-([yet](https://github.com/huberf/lastfm-scrobbler/pull/3)).  Currently we're rolling
+which is a bit clunky and ~~doesn't support custom timestamps
+([yet](https://github.com/huberf/lastfm-scrobbler/pull/3))~~ issue resolved, we will
+look into switching.  Currently we're rolling
 our own Last.FM integration based on `lastpy`.
 
 ## Limitations
@@ -55,27 +56,15 @@ Speaking of cookies, let's set this up:
    You should also set the `SECRET_KEY` now as this will be used to encrypt values in the database.
 3. Start the web server:
    ```bash
-   $ python -m flask run server
+   $ python -m flask --app server run
     * Serving Flask app 'server'
     * Debug mode: off
    INFO:werkzeug:WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
     * Running on http://127.0.0.1:5000
    INFO:werkzeug:Press CTRL+C to quit
    ```
-4. Navigate to the URL shown to begin setup.  You should see a message like this:
-   ![Header: Welcome to youtube-fm setup! Body: To add a user to this instance, (link) connect with Last.FM.](docs/step_4.png)
-   Click the link - it's already configured with your API key and will redirect to the running server.  On the new page,
-   click the Authorize button to return to the server.
-5. You should be returned to a screen like this:
-   ![Header: Last.FM API Callback - youtube-fm Body: header section with sample token and message to copy the token,
-   main section asking the user to paste the output of a linked guide in a textarea.](docs/step_5.png)
-   Follow the steps in the linked guide to get the necessary headers for YouTube Music, then paste those headers in the
-   text area and click Submit.
-6. You should see a notice that cookies were successfully saved:
-   ![Header: Cookies Callback - youtube-fm Body: success messsage saying that cookies were added with a button to
-   configure the new user](docs/step_6.png)
-   Click the button to configure the user, or close to accept the default values.
-7. To scrape YouTube Music and scrobble the tracks to Last.FM, run the main script:
+   Navigate to the URL shown to begin setup.
+4. To scrape YouTube Music and scrobble the tracks to Last.FM, run the main script:
    ```bash
    $ python -m daemon
    INFO:root:Connecting to core
@@ -105,9 +94,9 @@ Python.  There are some definite quality of life improvements to be made:
 
   Because Docker makes everything better.  Preferably not just the `main.py`, but a `cron`
   job or some other automation to run at *n* interval.
-- [ ] **Clean up this UI:**
-
-  It's so ugly.  Like, actually.  I literally threw this together for a proof of concept.
+- [x] ~~**Clean up this UI:**~~
+  
+  Bootstrap 5 and proper Flask blueprints.
 - [ ] **Wait for YouTube Music API to get better:**
 
   Either the unofficial version or (hopefully) an official version with the necessary
