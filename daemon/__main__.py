@@ -15,3 +15,4 @@ users = db.get_users_for_run(int(time()))
 for user in users:
     runner.run_user(user)
 logger.info("Ran stats for %i users", len(users))
+db.con.close()

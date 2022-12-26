@@ -3,7 +3,7 @@ from os import getenv
 from time import time
 from ytmusicapi import YTMusic
 
-from core import LastFM
+from . import LastFM
 
 
 class Runner:

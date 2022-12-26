@@ -78,7 +78,7 @@ class Database:
         cursor.execute("update users set uuid = ? where uuid = ?", [new.hex, uuid])
         cursor.close()
         self.con.commit()
-        return new.bytes
+        return new.hex
 
     def update_token(self, uuid, name, token):
         uuid = UUID(uuid).hex

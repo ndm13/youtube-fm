@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>YouTube-FM</title>
+    <title>Connect Last.FM - YouTube-FM Setup</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous"/>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"
@@ -15,12 +15,22 @@
         <a href="/" class="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
             <h3>YouTube-FM</h3>
         </a>
+
+        <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+            <li><span class="nav-item px-2 link-primary">Connect Last.FM</span></li>
+            <li>&gt;</li>
+            <li><span class="nav-item px-2 link-secondary">Connect YouTube Music</span></li>
+            <li>&gt;</li>
+            <li><span class="nav-item px-2 link-secondary">Configure Settings</span></li>
+        </ul>
+
+        <div class="col-md-3 text-end"></div>
     </header>
     <main class="py-5 col-md-9 mx-auto text-center">
         <h4>Welcome to YouTube-FM!</h4>
-        <p>Would you like to create a new link, or manage an existing one?</p>
-        <a class="btn btn-success" href="{{ url_for('setup.index') }}">New Link</a>
-        <a class="btn btn-primary" href="{{ url_for('configure.index') }}">Manage Existing Link</a>
+        <p>Connect your Last.FM account to get started!</p>
+        <a class="btn btn-primary"
+           href="https://www.last.fm/api/auth?api_key={{ api_token }}&cb={{ request.host_url }}setup/lastfm">Connect</a>
     </main>
 </div>
 </body>
