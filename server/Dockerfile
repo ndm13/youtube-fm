@@ -5,5 +5,5 @@ RUN pip install -r requirements.txt
 RUN pip install waitress
 COPY ../server /app/server
 COPY ../core /app/core
-EXPOSE 8000
+EXPOSE 8080
 CMD ["waitress-serve", "--host", "0.0.0.0", "--call", "server:create_app"]
