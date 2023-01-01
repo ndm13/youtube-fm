@@ -14,8 +14,10 @@ class Runner:
         max_time = start_time = int(time())
         self.logger.info("Running update for user %s (%s)", user.name, user.uuid)
 
-        pylast = LastFMNetwork(getenv('LASTFM_API'), getenv('LASTFM_SECRET'), user.token)
+        # Work around a bug in pylast: https://github.com/pylast/pylast/issues/300
+        pylast = LastFMNetwork(getenv('LASTFM_API'), getenv('LASTFM_SECRET'), user.token, user.name)
         ytm = YTMusic(user.cookie)
+
         # Storing the headers in the DB introduces carriage returns... somehow.
         # Could be a bug in the DB or the API.  Easiest solution is to manually strip the headers here.
         for key, value in ytm.headers.items():
@@ -46,6 +48,25 @@ class Runner:
             self.logger.debug("min_time=%i", max_time)
             many.append({"artist": artist, "title": title, "timestamp": max_time})
             max_time -= entry.get("duration_seconds")
+
+        lfm_history = pylast.get_authenticated_user().get_recent_tracks(len(many) * 1.5, True, user.last_run)
+        lfm_history = map(lambda e: {"artist": e.track.artist.name, "title": e.track.title}, lfm_history)
+        many_start = 0
+        for lfm in lfm_history:
+            trim = None
+            for ytm in many[many_start:]:
+                if lfm["title"] == ytm["title"] and lfm["artist"] == ytm["artist"]:
+                    logging.info("Skipping track '%s' by %s (already scrobbled)", ytm["title"], ytm["artist"])
+                    trim = many.index(ytm)
+                    break
+            if trim is not None:
+                many_start = trim
+                many.remove(many[trim])
+
+        if len(many) == 0:
+            self.logger.info("No new tracks to log, skipping...")
+            self.db.update_last_run(user.uuid, start_time)
+            return
 
         try:
             pylast.scrobble_many(many)
