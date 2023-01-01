@@ -1,15 +1,7 @@
 # youtube-fm
-A bridge between YouTube Music and Last.FM.
-
-I have found [exactly one](https://ytmusicapi.readthedocs.io/en/latest/index.html)
-YouTube Music API.  It is written in Python and is relatively limited, and that
-reflects on this project as well.  Additionally, there are two maintained Python
-Last.FM APIs: [`pylast`](https://github.com/pylast/pylast), which relies on an
-MD5-hashed user password, and [`lastpy`](https://github.com/huberf/lastfm-scrobbler),
-which is a bit clunky and ~~doesn't support custom timestamps
-([yet](https://github.com/huberf/lastfm-scrobbler/pull/3))~~ issue resolved, we will
-look into switching.  Currently we're rolling
-our own Last.FM integration based on `lastpy`.
+A bridge between YouTube Music and Last.FM.  Powered by
+[ytmusicapi](https://ytmusicapi.readthedocs.io/en/latest/index.html) and
+[pylast](https://github.com/pylast/pylast).
 
 ## Limitations
 This project works around limitations from YouTube Music in a few ways:
@@ -39,15 +31,19 @@ This project works around limitations from YouTube Music in a few ways:
      always assume it was played in full.  Again, very imperfect, but not much we can
      do about it without more API info.
 
-## Setup and Use
-With these limitations in mind, the intended use is a bit interesting: *run the script
-frequently.*  Good idea to have a sane limit (haven't load tested anything yet) of
-maybe 5-10 minutes, but probably not longer than once an hour.  Unless you're skipping
-through vast amounts of unique songs, you're unlikely to hit the Last.FM API limit,
-but considering that the YouTube Music API relies on browser cookies it's probably a
-good idea not to overdrive that, lest your actual YouTube account get flagged.
+## Overview
+The `daemon` module contains a script that runs at a regular interval, pulling
+in data for all users in the database that haven't had a run within their
+requested interval.  The daemon does this check every minute.  It's recommended
+that users not have an interval lower than a few minutes (default is five) to
+avoid having the YouTube API get flagged for excessive activity.  The Last.FM
+requests are batched, so they shouldn't be affected by the limit.
 
-Speaking of cookies, let's set this up:
+The `server` module contains a web server written in Flask that generates a web
+interface to add/manage users.  The port for the built-in server is `5000`; the
+port for the Waitress server used in production is `8080`.
+
+## Getting Started
 
 If you have Docker Compose, simply deploy the stack:
 ```yml
@@ -114,20 +110,8 @@ P.S: The default log level is `INFO`.  You can change it by setting the environm
 logging spec.
 
 ## Future Improvements
-This is the minimum product I'm comfortable releasing after a long night of relearning
-Python.  There are some definite quality of life improvements to be made:
-- [x] ~~**HTTP server:**~~
-
-  Currently using Flask to handle Last.FM callback and user configuration.
-- [x] ~~**A database:**~~
-
-  Currently using Sqlite3 with a user-provided `SECRET_KEY` encrypting the user tokens/cookies.
-- [x] ~~**Docker container:**~~
-
-  Continuously deploying containers for both daemon and server.  Docs include a compose file.
-- [x] ~~**Clean up this UI:**~~
-  
-  Bootstrap 5 and proper Flask blueprints.
+There are some definite quality of life improvements to be made, mostly reliant
+on external factors:
 - [ ] **Wait for YouTube Music API to get better:**
 
   Either the unofficial version or (hopefully) an official version with the necessary
@@ -137,9 +121,7 @@ Python.  There are some definite quality of life improvements to be made:
   This is the highest bar for casual adoption. Not sure how to solve this, but I know
   there are already extensions that do this for YouTube-DL-type services.  Needs
   investigation, may be able to repurpose an existing extension.
-- [ ] **Python is not my language of choice:**
-
-  If you see something wrong from a style or convention perspective let me know!  I'd love
-  to get this ported to Deno or something like that, but I want to keep support for the
-  *only* existing YouTube Music API for now so it's going to stay Python for the time
-  being.
+- [ ] **Anything else:**
+  
+  Code quality (Python isn't my best language) fixes can be submitted as pull
+  requests.  New features or bugfixes can be submitted as issues.

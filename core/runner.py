@@ -2,8 +2,7 @@ import logging
 from os import getenv
 from time import time
 from ytmusicapi import YTMusic
-
-from . import LastFM
+from pylast import LastFMNetwork, PyLastError
 
 
 class Runner:
@@ -15,7 +14,7 @@ class Runner:
         max_time = start_time = int(time())
         self.logger.info("Running update for user %s (%s)", user.name, user.uuid)
 
-        lastfm = LastFM(getenv('LASTFM_API'), getenv('LASTFM_SECRET'), session_token=user.token)
+        pylast = LastFMNetwork(getenv('LASTFM_API'), getenv('LASTFM_SECRET'), user.token)
         ytm = YTMusic(user.cookie)
         # Storing the headers in the DB introduces carriage returns... somehow.
         # Could be a bug in the DB or the API.  Easiest solution is to manually strip the headers here.
@@ -34,6 +33,7 @@ class Runner:
             self.db.update_last_run(user.uuid, start_time)
             return
 
+        many = []
         for entry in history:
             self.logger.debug("Found history entry: %s", entry)
             title = entry.get("title")
@@ -44,10 +44,13 @@ class Runner:
                                        filter(lambda e: e["id"] is not None, entry.get("artists"))))
             self.logger.info("Scrobbling '%s' by %s", title, artist)
             self.logger.debug("min_time=%i", max_time)
-            if not lastfm.scrobble(artist, title, max_time):
-                self.logger.error("Failed to scrobble track: '%s' by %s (id: %s)", title, artist, entry.get('videoId'))
+            many.append({"artist": artist, "title": title, "timestamp": max_time})
             max_time -= entry.get("duration_seconds")
 
-        self.logger.info("Writing ID %s as new last", ids[0])
-        self.db.update_last_id(user.uuid, ids[0])
-        self.db.update_last_run(user.uuid, start_time)
+        try:
+            pylast.scrobble_many(many)
+            self.logger.info("Writing ID %s as new last", ids[0])
+            self.db.update_last_id(user.uuid, ids[0])
+            self.db.update_last_run(user.uuid, start_time)
+        except PyLastError as ple:
+            self.logger.error(ple)

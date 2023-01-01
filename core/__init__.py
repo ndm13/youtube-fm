@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 
 from .config_dir import config_dir
 from .db import Database, DatabaseException
-from .lastfm import LastFM, LastFMException
 from .runner import Runner
 
 load_dotenv(path.join(config_dir, ".env"))

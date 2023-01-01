@@ -4,9 +4,9 @@ import os
 from flask import (
     Blueprint, flash, redirect, render_template, request, session, url_for
 )
+from pylast import LastFMNetwork, SessionKeyGenerator, PyLastError
 from ytmusicapi import YTMusic
 
-from core import LastFM, LastFMException
 from .db import get_db
 
 bp = Blueprint('setup', __name__, url_prefix='/setup')
@@ -26,11 +26,11 @@ def lastfm():
     token = request.args['token']
 
     try:
-        api = LastFM(lastfm_key, lastfm_secret)
-        (lastfm_session, name) = api.authorize(token)
-    except LastFMException as lfme:
-        logger.error(lfme)
-        flash("Exception while authorizing LastFM user: " + lfme.args[0], "error")
+        (lastfm_session, name) = SessionKeyGenerator(LastFMNetwork(lastfm_key, lastfm_secret))\
+            .get_web_auth_session_key_username(None, token)
+    except PyLastError as ple:
+        logger.error(ple)
+        flash("Exception while authorizing LastFM user: " + ple.args[0], "error")
         return render_template("setup/lastfm.html", api_token=lastfm_key), 401
 
     session.pop("_flashes", None)
