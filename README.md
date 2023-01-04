@@ -35,8 +35,8 @@ This project works around limitations from YouTube Music in a few ways:
 The `daemon` module contains a script that runs at a regular interval, pulling
 in data for all users in the database that haven't had a run within their
 requested interval.  The daemon does this check every minute.  It's recommended
-that users not have an interval lower than a few minutes (default is five) to
-avoid having the YouTube API get flagged for excessive activity.  The Last.FM
+that users should not have an interval lower than a few minutes (default is five)
+to avoid having the YouTube API get flagged for excessive activity.  The Last.FM
 requests are batched, so they shouldn't be affected by the limit.
 
 The `server` module contains a web server written in Flask that generates a web
