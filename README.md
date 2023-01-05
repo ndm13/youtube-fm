@@ -4,7 +4,7 @@
 [![CodeQL](https://github.com/ndm13/youtube-fm/actions/workflows/codeql.yml/badge.svg)](https://github.com/ndm13/youtube-fm/actions/workflows/codeql.yml)
 
 A bridge between YouTube Music and Last.FM.  Powered by
-[ytmusicapi](https://ytmusicapi.readthedocs.io/en/latest/index.html) and
+[ytmusicapi](https://github.com/sigma67/ytmusicapi) and
 [pylast](https://github.com/pylast/pylast).
 
 ## Limitations
