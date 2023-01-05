@@ -29,7 +29,7 @@ class Runner:
 
         if user.last_id:
             self.logger.info("Found last played ID: %s", user.last_id)
-            if user.last_id in history:
+            if user.last_id in ids:
                 history = history[0:ids.index(user.last_id)]
             else:
                 self.logger.warning("Last played ID not in history (%s): some tracks may not be scrobbled", user.name)
