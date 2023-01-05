@@ -22,7 +22,8 @@ class Runner:
         # Could be a bug in the DB or the API.  Easiest solution is to manually strip the headers here.
         for key, value in ytm.headers.items():
             ytm.headers[key] = ytm.headers[key].strip()
-        history = ytm.get_history()
+        # Fix bug for unreliable ordering in bucketed history
+        history = list(filter(lambda e: e.get('played') == "Today", ytm.get_history()))
 
         ids = list(map(lambda e: e['videoId'], history))
 
