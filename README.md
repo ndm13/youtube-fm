@@ -1,4 +1,8 @@
 # youtube-fm
+[![Docker](https://github.com/ndm13/youtube-fm/actions/workflows/docker.yml/badge.svg)](https://github.com/ndm13/youtube-fm/actions/workflows/docker.yml)
+[![Dependency Review](https://github.com/ndm13/youtube-fm/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/ndm13/youtube-fm/actions/workflows/dependency-review.yml)
+[![CodeQL](https://github.com/ndm13/youtube-fm/actions/workflows/codeql.yml/badge.svg)](https://github.com/ndm13/youtube-fm/actions/workflows/codeql.yml)
+
 A bridge between YouTube Music and Last.FM.  Powered by
 [ytmusicapi](https://ytmusicapi.readthedocs.io/en/latest/index.html) and
 [pylast](https://github.com/pylast/pylast).
