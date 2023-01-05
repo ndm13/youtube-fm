@@ -32,9 +32,13 @@
         {% endfor %}
         {% if not session.user %}
             <p>It doesn't look like you have an active session. Enter your account ID to get started:</p>
-            <form class="input-group w-50 mx-auto" method="post" action="{{ url_for('configure.index') }}">
-                <input class="form-control" type="text" name="user" placeholder="00000000-0000-0000-0000-000000000000"/>
-                <button type="submit" class="btn btn-primary">Let's Go</button>
+            <form method="post" action="{{ url_for('configure.index') }}"
+                  class="input-group m-auto flex-grow-1 flex-nowrap w-50" id="acc-id">
+                <input type="password" id="user" name="user" class="form-control" placeholder="00000000-0000-0000-0000-000000000000" value="{{ session.user }}"/>
+                <button type="button" class="btn btn-outline-dark">
+                    <i class="bi bi-eye-slash"></i>
+                </button>
+                <button type='submit' class="btn btn-primary">Let's Go</button>
             </form>
         {% else %}
             <p>Welcome, {{ user.name }}!</p>
@@ -52,8 +56,8 @@
                       class="input-group m-auto flex-grow-1 flex-nowrap" id="acc-id">
                     <label for="key" class="input-group-text">Account ID:</label>
                     <span class="col-md-6">
-                    <input type="password" id="key" class="form-control" value="{{ session.user }}"/>
-                </span>
+                        <input type="password" id="key" class="form-control" value="{{ session.user }}"/>
+                    </span>
                     <button type="button" class="btn btn-outline-dark">
                         <i class="bi bi-eye-slash"></i>
                     </button>
@@ -61,12 +65,6 @@
                 </form>
                 <a class="btn btn-info" href="{{ url_for('configure.sign_out') }}">Sign&nbsp;Out</a>
             </div>
-            <script>
-                (acc => ((p, b) => b.onclick = () => {
-                    p.setAttribute('type', p.getAttribute('type') === 'password' ? 'text' : 'password');
-                    b.querySelector('i').classList.toggle('bi-eye');
-                })(acc.querySelector('input[type=password]'), acc.querySelector('button')))(document.getElementById('acc-id'));
-            </script>
             </p>
             <h5>Scrobble Settings</h5>
             <p>Configure how we scrobble data from YouTube Music to Last.FM.</p>
@@ -125,6 +123,12 @@
                    href="{{ url_for('setup.ytmusic') }}">{{ "Re-Link" if user.cookie else "Link" }}</a>
             </span>
         {% endif %}
+        <script>
+            (acc => ((p, b) => b.onclick = () => {
+                p.setAttribute('type', p.getAttribute('type') === 'password' ? 'text' : 'password');
+                b.querySelector('i').classList.toggle('bi-eye');
+            })(acc.querySelector('input[type=password]'), acc.querySelector('button')))(document.getElementById('acc-id'));
+        </script>
     </main>
 </div>
 </body>
