@@ -29,10 +29,10 @@ class Runner:
 
         if user.last_id:
             self.logger.info("Found last played ID: %s", user.last_id)
-            if user.last_id in history:
+            if user.last_id in ids:
                 history = history[0:ids.index(user.last_id)]
             else:
-                self.logger.warning("Last played ID missing for %s: some tracks may not be scrobbled", user.name)
+                self.logger.warning("Last played ID not in history (%s): some tracks may not be scrobbled", user.name)
 
         if len(history) == 0:
             self.logger.info("No new tracks to log, skipping...")
@@ -52,6 +52,8 @@ class Runner:
             self.logger.debug("min_time=%i", max_time)
             many.append({"artist": artist, "title": title, "timestamp": max_time})
             max_time -= entry.get("duration_seconds")
+            if max_time < user.last_run:
+                self.logger.warning("Scrobbling tracks before last run!  Stopping early.")
 
         lfm_history = pylast.get_authenticated_user().get_recent_tracks(len(many) * 1.5, True, user.last_run)
         lfm_history = map(lambda e: {"artist": e.track.artist.name, "title": e.track.title}, lfm_history)
