@@ -68,7 +68,7 @@ class Runner:
         scrobbles = []
         for play in history:
             self.logger.debug("Found history entry: %s", play)
-            artist, title = self.get_artist_and_title(play, split_title)
+            artist, title = Runner.get_artist_and_title(play, split_title)
             self.logger.info("Scrobbling '%s' by %s", title, artist)
             self.logger.debug("max_time=%i", max_time)
             scrobble = {
@@ -79,7 +79,7 @@ class Runner:
             }
             if "album" in play.keys() and play['album'] is not None and "name" in play['album'].keys():
                 album = play['album']['name']
-                if album is not None and album is not '':
+                if album is not None and album != '':
                     scrobble['album'] = album
             scrobbles.append(scrobble)
             max_time -= play['duration_seconds']
@@ -102,17 +102,17 @@ class Runner:
 
     @staticmethod
     def get_artist_and_title(play, split_title):
-        title = play.get("title")
+        title = play['title']
         if split_title and " - " in title:
-            (artist, title) = title.split(" - ")
+            artist, title = title.split(" - ", 1)
         else:
-            artist = ", ".join(map(lambda e: e["name"],
-                                   filter(lambda e: e["id"] is not None, play.get("artists"))))
+            artist = ", ".join(map(lambda e: e['name'],
+                                   filter(lambda e: e['id'] is not None, play['artists'])))
         return artist, title
 
     @staticmethod
-    def get_ytm(cookie):
-        ytm = YTMusic(cookie)
+    def get_ytm(headers):
+        ytm = YTMusic(headers)
         # Storing the headers in the DB introduces carriage returns... somehow.
         # Could be a bug in the DB or the API.  Easiest solution is to manually strip the headers here.
         for key, value in ytm.headers.items():
