@@ -1,6 +1,6 @@
 python-dotenv~=0.21.0
 ytmusicapi==0.24.1
-cryptography==41.0.0
+cryptography==41.0.3
 Flask~=2.2.2
 dataclasses~=0.6
 pylast~=5.1.0
